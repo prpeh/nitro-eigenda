@@ -15,12 +15,15 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/offchainlabs/nitro/arbutil"
+	flag "github.com/spf13/pflag"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
 
 // EigenDAMessageHeaderFlag indicated that the message is a EigenDARef which will be used to retrieve data from EigenDA
-const EigenDAMessageHeaderFlag byte = 0x0c
+const EigenDAMessageHeaderFlag byte = 0x0e
+
+var ErrBatchToEigenDA = errors.New("disperser blob failed")
 
 func IsEigenDAMessageHeaderByte(header byte) bool {
 	return (EigenDAMessageHeaderFlag & header) > 0
@@ -49,6 +52,16 @@ func (ec *EigenDAConfig) String() {
 type EigenDARef struct {
 	BatchHeaderHash []byte
 	BlobIndex       uint32
+}
+
+var DefaultEigenDAConfig = EigenDAConfig{
+	Enable: false,
+	Rpc:    "disperser-goerli.eigenda.xyz:443 ",
+}
+
+func EigenDAConfigAddOptions(prefix string, f *flag.FlagSet) {
+	f.Bool(prefix+".enable", DefaultEigenDAConfig.Enable, "enable EigenDA mode")
+	f.String(prefix+".rpc", DefaultEigenDAConfig.Rpc, "eigenda rpc")
 }
 
 func (b *EigenDARef) Serialize() ([]byte, error) {
@@ -137,7 +150,7 @@ func (e *EigenDA) Store(ctx context.Context, data []byte) (*EigenDARef, error) {
 			}
 			return ref, nil
 		case disperser.BlobStatus_FAILED:
-			return nil, errors.New("disperser blob failed")
+			return nil, ErrBatchToEigenDA
 		default:
 			continue
 		}
