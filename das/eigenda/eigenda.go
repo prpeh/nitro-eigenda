@@ -14,10 +14,18 @@ import (
 	"github.com/Layr-Labs/eigenda/api/grpc/disperser"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/offchainlabs/nitro/arbutil"
 	flag "github.com/spf13/pflag"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+)
+
+var (
+	blobPutAcceptedCounter = metrics.NewRegisteredCounter("arb/eigenda-blob/put/accepted", nil)
+	blobPutRejectedCounter = metrics.NewRegisteredCounter("arb/eigenda-blob/put/rejected", nil)
+	blobGetAcceptedCounter = metrics.NewRegisteredCounter("abr/eigenda-blob/get/accepted", nil)
+	blobGetRejectedCounter = metrics.NewRegisteredCounter("abr/eigenda-blob/get/accepted", nil)
 )
 
 // EigenDAMessageHeaderFlag indicated that the message is a EigenDARef which will be used to retrieve data from EigenDA
@@ -114,8 +122,10 @@ func (e *EigenDA) QueryBlob(ctx context.Context, ref *EigenDARef) ([]byte, error
 		BlobIndex:       ref.BlobIndex,
 	})
 	if err != nil {
+		blobGetRejectedCounter.Inc(1)
 		return nil, err
 	}
+	blobGetAcceptedCounter.Inc(1)
 	return res.GetData(), nil
 }
 
@@ -140,6 +150,7 @@ func (e *EigenDA) Store(ctx context.Context, data []byte) (*EigenDARef, error) {
 		statusReply, err := e.GetBlobStatus(ctx, res.GetRequestId())
 		if err != nil {
 			log.Error("[eigenda]: GetBlobStatus: ", "error", err.Error())
+			blobPutRejectedCounter.Inc(1)
 			continue
 		}
 		switch statusReply.GetStatus() {
@@ -148,8 +159,10 @@ func (e *EigenDA) Store(ctx context.Context, data []byte) (*EigenDARef, error) {
 				BatchHeaderHash: statusReply.GetInfo().GetBlobVerificationProof().GetBatchMetadata().GetBatchHeaderHash(),
 				BlobIndex:       statusReply.GetInfo().GetBlobVerificationProof().GetBlobIndex(),
 			}
+			blobPutAcceptedCounter.Inc(1)
 			return ref, nil
 		case disperser.BlobStatus_FAILED:
+			blobPutRejectedCounter.Inc(1)
 			return nil, ErrBatchToEigenDA
 		default:
 			continue
