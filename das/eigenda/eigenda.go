@@ -22,10 +22,10 @@ import (
 )
 
 var (
-	blobPutAcceptedCounter = metrics.NewRegisteredCounter("arb/eigenda-blob/put/accepted", nil)
-	blobPutRejectedCounter = metrics.NewRegisteredCounter("arb/eigenda-blob/put/rejected", nil)
-	blobGetAcceptedCounter = metrics.NewRegisteredCounter("abr/eigenda-blob/get/accepted", nil)
-	blobGetRejectedCounter = metrics.NewRegisteredCounter("abr/eigenda-blob/get/accepted", nil)
+	blobPutAcceptedCounter = metrics.NewRegisteredCounter("arb/eigenda/put_accepted", nil)
+	blobPutRejectedCounter = metrics.NewRegisteredCounter("arb/eigenda/put_rejected", nil)
+	blobGetAcceptedCounter = metrics.NewRegisteredCounter("arb/eigenda/get_accepted", nil)
+	blobGetRejectedCounter = metrics.NewRegisteredCounter("arb/eigenda/get_accepted", nil)
 )
 
 // EigenDAMessageHeaderFlag indicated that the message is a EigenDARef which will be used to retrieve data from EigenDA
