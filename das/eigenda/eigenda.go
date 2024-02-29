@@ -139,6 +139,7 @@ func (e *EigenDA) Store(ctx context.Context, data []byte) (*EigenDARef, error) {
 
 	res, err := e.client.DisperseBlob(ctx, disperseBlobRequest)
 	if err != nil {
+		blobPutRejectedCounter.Inc(1)
 		return nil, err
 	}
 
