@@ -186,20 +186,11 @@ func main() {
 		if lastBlockHeader != nil {
 			delayedMessagesRead = lastBlockHeader.Nonce.Uint64()
 		}
-		// var dasReader arbstate.DataAvailabilityReader
-		// if dasEnabled {
-		// 	dasReader = &PreimageDASReader{}
-		// }
 		var dasReader eigenda.EigenDAReader
 		if dasEnabled {
 			dasReader = &PreimageEigenDAReader{}
 		}
 		backend := WavmInbox{}
-		// var keysetValidationMode = arbstate.KeysetPanicIfInvalid
-		// if backend.GetPositionWithinMessage() > 0 {
-		// 	keysetValidationMode = arbstate.KeysetDontValidate
-		// }
-		// todo
 		inboxMultiplexer := arbstate.NewInboxMultiplexer(backend, delayedMessagesRead, nil, dasReader, arbstate.KeysetDontValidate)
 		ctx := context.Background()
 		message, err := inboxMultiplexer.Pop(ctx)
