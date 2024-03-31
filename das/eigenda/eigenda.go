@@ -66,15 +66,11 @@ type EigenDARef struct {
 var DefaultEigenDAConfig = EigenDAConfig{
 	Enable:             false,
 	Rpc:                "disperser-holesky.eigenda.xyz:443",
-	AdversaryThreshold: 25,
-	QuorumThreshold:    50,
 }
 
 func EigenDAConfigAddOptions(prefix string, f *flag.FlagSet) {
 	f.Bool(prefix+".enable", DefaultEigenDAConfig.Enable, "enable EigenDA mode")
 	f.String(prefix+".rpc", DefaultEigenDAConfig.Rpc, "eigenda rpc")
-	f.Uint32(prefix+".adversary_threshold", DefaultEigenDAConfig.AdversaryThreshold, "adversary_threshold")
-	f.Uint32(prefix+".quorum_threshold", DefaultEigenDAConfig.QuorumThreshold, "quorum_threshold")
 }
 
 func (b *EigenDARef) Serialize() ([]byte, error) {
@@ -105,11 +101,9 @@ func (b *EigenDARef) Deserialize(data []byte) error {
 
 type EigenDA struct {
 	client             disperser.DisperserClient
-	AdversaryThreshold uint8
-	QuorumThreshold    uint8
 }
 
-func NewEigenDA(rpc string, adversary_threshold, quorum_threshold uint8) (*EigenDA, error) {
+func NewEigenDA(rpc string) (*EigenDA, error) {
 	creds := credentials.NewTLS(&tls.Config{
 		InsecureSkipVerify: true,
 	})
@@ -119,8 +113,6 @@ func NewEigenDA(rpc string, adversary_threshold, quorum_threshold uint8) (*Eigen
 	}
 	return &EigenDA{
 		client:             disperser.NewDisperserClient(conn),
-		AdversaryThreshold: adversary_threshold,
-		QuorumThreshold:    quorum_threshold,
 	}, nil
 }
 
@@ -140,9 +132,6 @@ func (e *EigenDA) QueryBlob(ctx context.Context, ref *EigenDARef) ([]byte, error
 func (e *EigenDA) Store(ctx context.Context, data []byte) (*EigenDARef, error) {
 	disperseBlobRequest := &disperser.DisperseBlobRequest{
 		Data: data,
-		SecurityParams: []*disperser.SecurityParams{
-			{QuorumId: 0, AdversaryThreshold: e.AdversaryThreshold, QuorumThreshold: e.QuorumThreshold},
-		},
 	}
 
 	res, err := e.client.DisperseBlob(ctx, disperseBlobRequest)

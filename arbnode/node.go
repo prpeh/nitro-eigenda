@@ -513,7 +513,7 @@ func createNodeImpl(
 	} else if l2Config.ArbitrumChainParams.DataAvailabilityCommittee {
 		return nil, errors.New("a data availability service is required for this chain, but it was not configured")
 	} else if config.EigenDA.Enable {
-		eigenDAService, err := eigenda.NewEigenDA(config.EigenDA.Rpc, config.EigenDA.AdversaryThreshold, config.EigenDA.QuorumThreshold)
+		eigenDAService, err := eigenda.NewEigenDA(config.EigenDA.Rpc)
 		if err != nil {
 			return nil, err
 		}
