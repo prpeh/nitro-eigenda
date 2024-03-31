@@ -64,8 +64,8 @@ type EigenDARef struct {
 }
 
 var DefaultEigenDAConfig = EigenDAConfig{
-	Enable:             false,
-	Rpc:                "disperser-holesky.eigenda.xyz:443",
+	Enable: false,
+	Rpc:    "disperser-holesky.eigenda.xyz:443",
 }
 
 func EigenDAConfigAddOptions(prefix string, f *flag.FlagSet) {
@@ -100,7 +100,7 @@ func (b *EigenDARef) Deserialize(data []byte) error {
 }
 
 type EigenDA struct {
-	client             disperser.DisperserClient
+	client disperser.DisperserClient
 }
 
 func NewEigenDA(rpc string) (*EigenDA, error) {
@@ -112,7 +112,7 @@ func NewEigenDA(rpc string) (*EigenDA, error) {
 		return nil, err
 	}
 	return &EigenDA{
-		client:             disperser.NewDisperserClient(conn),
+		client: disperser.NewDisperserClient(conn),
 	}, nil
 }
 
