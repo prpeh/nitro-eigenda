@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/Layr-Labs/eigenda/api/grpc/disperser"
-	"github.com/Layr-Labs/eigenda/encoding/utils/codec"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
@@ -127,14 +126,12 @@ func (e *EigenDA) QueryBlob(ctx context.Context, ref *EigenDARef) ([]byte, error
 		return nil, err
 	}
 	blobGetAcceptedCounter.Inc(1)
-	decodedData := codec.RemoveEmptyByteFromPaddedBytes(res.GetData())
-	return decodedData, nil
+	return res.GetData(), nil
 }
 
 func (e *EigenDA) Store(ctx context.Context, data []byte) (*EigenDARef, error) {
-	encodedData := codec.ConvertByPaddingEmptyByte(data)
 	disperseBlobRequest := &disperser.DisperseBlobRequest{
-		Data: encodedData,
+		Data: data,
 	}
 
 	res, err := e.client.DisperseBlob(ctx, disperseBlobRequest)
