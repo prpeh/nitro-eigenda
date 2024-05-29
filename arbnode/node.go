@@ -163,6 +163,7 @@ var ConfigDefault = Config{
 	Staker:              staker.DefaultL1ValidatorConfig,
 	SeqCoordinator:      DefaultSeqCoordinatorConfig,
 	DataAvailability:    das.DefaultDataAvailabilityConfig,
+	EigenDA:             eigenda.DefaultEigenDAConfig,
 	SyncMonitor:         DefaultSyncMonitorConfig,
 	Dangerous:           DefaultDangerousConfig,
 	TransactionStreamer: DefaultTransactionStreamerConfig,

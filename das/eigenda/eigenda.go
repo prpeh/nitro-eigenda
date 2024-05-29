@@ -50,7 +50,7 @@ type EigenDAConfig struct {
 	Enable             bool   `koanf:"enable"`
 	Rpc                string `koanf:"rpc"`
 	AdversaryThreshold uint32 `koanf:"adversary_threshold"`
-	QuorumThreshold    uint32 `koanf:"quorum_threshold`
+	QuorumThreshold    uint32 `koanf:"quorum_threshold"`
 }
 
 func (ec *EigenDAConfig) String() {
@@ -64,13 +64,17 @@ type EigenDARef struct {
 }
 
 var DefaultEigenDAConfig = EigenDAConfig{
-	Enable: false,
-	Rpc:    "disperser-holesky.eigenda.xyz:443",
+	Enable:             true,
+	Rpc:                "disperser-holesky.eigenda.xyz:443",
+	AdversaryThreshold: 25,
+	QuorumThreshold:    50,
 }
 
 func EigenDAConfigAddOptions(prefix string, f *flag.FlagSet) {
 	f.Bool(prefix+".enable", DefaultEigenDAConfig.Enable, "enable EigenDA mode")
 	f.String(prefix+".rpc", DefaultEigenDAConfig.Rpc, "eigenda rpc")
+	f.Uint32(prefix+".adversary_threshold", DefaultEigenDAConfig.AdversaryThreshold, "adversary_threshold")
+	f.Uint32(prefix+".quorum_threshold", DefaultEigenDAConfig.QuorumThreshold, "quorum_threshold")
 }
 
 func (b *EigenDARef) Serialize() ([]byte, error) {
